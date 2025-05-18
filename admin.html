@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LatestNews9.Com - Admin Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #FFFFFF;
+            --dark-color: #2c3e50;
+            --light-gray: #f4f4f4;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #757575;
+            --error-color: #e74c3c;
+            --warning-color: #f39c12;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--primary-color);
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            margin-top: 0;
+            color: var(--dark-gray);
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+
+        table tr:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: #3d8b40;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-gray);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .api-key-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .api-key-status.active {
+            background-color: var(--primary-color);
+        }
+
+        .api-key-status.inactive {
+            background-color: var(--dark-gray);
+        }
+
+        .api-key-status.limited {
+            background-color: var(--warning-color);
+        }
+
+        .api-key-status.error {
+            background-color: var(--error-color);
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--light-gray);
+        }
+
+        .login-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            margin-top: 0;
+            color: var(--dark-color);
+            text-align: center;
+        }
+
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="login-section" class="login-container">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <div id="login-error" class="alert alert-danger hidden"></div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" class="form-control" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" class="form-control" id="login-password" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard (hidden by default) -->
+    <div id="admin-dashboard" class="dashboard hidden">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>LatestNews9.Com</h2>
+                <p>Admin Dashboard</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-section="dashboard">Dashboard</a></li>
+                <li><a href="#" data-section="visitors">Visitors</a></li>
+                <li><a href="#" data-section="api-keys">API Keys</a></li>
+                <li><a href="#" data-section="admins">Admin Users</a></li>
+                <li><a href="#" data-section="settings">Settings</a></li>
+                <li><a href="/" target="_blank">View Website</a></li>
+                <li><a href="#" id="logout">Logout</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Dashboard Overview</h1>
+                <div id="current-time"></div>
+            </div>
+
+            <div id="dashboard-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Active Visitors</h3>
+                        <div class="value" id="active-visitors">0</div>
+                        <p>Currently browsing</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Today's Visitors</h3>
+                        <div class="value" id="today-visitors">0</div>
+                        <p>Unique visitors today</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>API Requests</h3>
+                        <div class="value" id="api-requests">0</div>
+                        <p>Today's API calls</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>News Fetched</h3>
+                        <div class="value" id="news-count">0</div>
+                        <p>Articles today</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent API Usage</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="api-usage-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>API Key</th>
+                                    <th>Provider</th>
+                                    <th>Language</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Filled by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="api-keys-section" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Manage API Keys</h2>
+                        <button class="btn" id="add-api-key">Add Key</button>
+                    </div>
+                    <table id="api-keys-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Provider</th>
+                                <th>API Key</th>
+                                <th>Usage</th>
+                                <th>Last Used</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card hidden" id="add-key-form">
+                    <div class="card-header">
+                        <h2>Add New API Key</h2>
+                    </div>
+                    <form id="api-key-form">
+                        <div class="form-group">
+                            <label for="api-provider">Provider</label>
+                            <select class="form-control" id="api-provider" required>
+                                <option value="gnews">GNews</option>
+                                <option value="newsapi">NewsAPI</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="api-key-value">API Key</label>
+                            <input type="text" class="form-control" id="api-key-value" required>
+                        </div>
+                        <button type="submit" class="btn">Save Key</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-add-key" style="margin-left: 10px;">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="admins-section" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Admin Users</h2>
+                        <button class="btn" id="add-admin-btn">Add Admin</button>
+                    </div>
+                    <table id="admins-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Created At</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card hidden" id="add-admin-form">
+                    <div class="card-header">
+                        <h2>Add New Admin</h2>
+                    </div>
+                    <form id="admin-form">
+                        <div class="form-group">
+                            <label for="admin-email">Email</label>
+                            <input type="email" class="form-control" id="admin-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-name">Name</label>
+                            <input type="text" class="form-control" id="admin-name" required>
+                        </div>
+                        <button type="submit" class="btn">Add Admin</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-add-admin" style="margin-left: 10px;">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="loading-section" class="loading">
+                <div class="spinner"></div>
+                <p>Loading dashboard...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+
+    <script>
+        // Firebase configuration - Replace with your actual config
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-t4sPAaIoqVztGk5a3qTw_vwR64Uix50",
+            authDomain: "latestnews9-948f3.firebaseapp.com",
+            projectId: "latestnews9-948f3",
+            storageBucket: "latestnews9-948f3.firebasestorage.app",
+            messagingSenderId: "230648934418",
+            appId: "1:230648934418:web:8583093462543c17e7e8cb",
+            measurementId: "G-PFJF25EXYY"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const loadingSection = document.getElementById('loading-section');
+        const logoutBtn = document.getElementById('logout');
+        const currentTimeEl = document.getElementById('current-time');
+
+        // Check authentication state
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in, check if admin
+                checkAdminStatus(user.uid);
+            } else {
+                // No user is signed in
+                showLogin();
+            }
+        });
+
+        // Login form submission
+        loginForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            loginError.classList.add('hidden');
+            loadingSection.classList.remove('hidden');
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Login successful, check admin status
+                    checkAdminStatus(userCredential.user.uid);
+                })
+                .catch((error) => {
+                    loadingSection.classList.add('hidden');
+                    loginError.textContent = error.message;
+                    loginError.classList.remove('hidden');
+                });
+        });
+
+        // Logout button
+        logoutBtn.addEventListener('click', e => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                showLogin();
+            });
+        });
+
+        function checkAdminStatus(uid) {
+            db.collection('admins').doc(uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        // User is admin, show dashboard
+                        showDashboard();
+                        initDashboard();
+                    } else {
+                        // User is not admin
+                        auth.signOut();
+                        loginError.textContent = 'You do not have admin privileges';
+                        loginError.classList.remove('hidden');
+                        loadingSection.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking admin status:', error);
+                    auth.signOut();
+                    loginError.textContent = 'Error verifying admin status';
+                    loginError.classList.remove('hidden');
+                    loadingSection.classList.add('hidden');
+                });
+        }
+
+        function showLogin() {
+            loginSection.classList.remove('hidden');
+            adminDashboard.classList.add('hidden');
+            loginForm.reset();
+        }
+
+        function showDashboard() {
+            loginSection.classList.add('hidden');
+            adminDashboard.classList.remove('hidden');
+            loadingSection.classList.add('hidden');
+        }
+
+        function initDashboard() {
+            // Update current time
+            function updateTime() {
+                currentTimeEl.textContent = new Date().toLocaleString();
+            }
+            setInterval(updateTime, 1000);
+            updateTime();
+
+            // Section switching
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('data-section')) {
+                        e.preventDefault();
+                        
+                        // Hide all sections
+                        document.querySelectorAll('[id$="-section"]').forEach(section => {
+                            section.classList.add('hidden');
+                        });
+                        
+                        // Show selected section
+                        const sectionId = this.getAttribute('data-section') + '-section';
+                        document.getElementById(sectionId).classList.remove('hidden');
+                        
+                        // Update active menu item
+                        document.querySelectorAll('.sidebar-menu a').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Load dashboard data
+            loadDashboardData();
+            initApiKeysSection();
+            initAdminsSection();
+        }
+
+        function loadDashboardData() {
+            // Load stats
+            loadStats();
+            
+            // Load recent API usage
+            loadRecentApiUsage();
+        }
+
+        function loadStats() {
+            // Today's date for filtering
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Active visitors (last 5 minutes)
+            db.collection('visitors')
+                .where('lastActive', '>', new Date(Date.now() - 5 * 60 * 1000))
+                .get()
+                .then(snapshot => {
+                    document.getElementById('active-visitors').textContent = snapshot.size;
+                });
+
+            // Today's visitors
+            db.collection('visitors')
+                .where('firstVisit', '>=', today)
+                .get()
+                .then(snapshot => {
+                    document.getElementById('today-visitors').textContent = snapshot.size;
+                });
+
+            // Today's API requests
+            db.collection('apiUsage')
+                .where('timestamp', '>=', today)
+                .get()
+                .then(snapshot => {
+                    document.getElementById('api-requests').textContent = snapshot.size;
+                });
+
+            // Today's news count (example - you'll need to implement this based on your data)
+            document.getElementById('news-count').textContent = 'N/A';
+        }
+
+        function loadRecentApiUsage() {
+            const tableBody = document.querySelector('#api-usage-table tbody');
+            tableBody.innerHTML = '<tr><td colspan="5">Loading data...</td></tr>';
+
+            db.collection('apiUsage')
+                .orderBy('timestamp', 'desc')
+                .limit(10)
+                .get()
+                .then(snapshot => {
+                    tableBody.innerHTML = '';
+
+                    if (snapshot.empty) {
+                        tableBody.innerHTML = '<tr><td colspan="5">No API usage data found</td></tr>';
+                        return;
+                    }
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${data.timestamp?.toDate().toLocaleString() || 'N/A'}</td>
+                            <td>${data.apiKey?.substring(0, 6)}...</td>
+                            <td>${data.provider}</td>
+                            <td>${data.language}</td>
+                            <td>${data.category}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    tableBody.innerHTML = '<tr><td colspan="5">Error loading data</td></tr>';
+                    console.error('Error loading API usage:', error);
+                });
+        }
+
+        function initApiKeysSection() {
+            const addKeyBtn = document.getElementById('add-api-key');
+            const cancelAddKeyBtn = document.getElementById('cancel-add-key');
+            const apiKeyForm = document.getElementById('api-key-form');
+            const addKeyForm = document.getElementById('add-key-form');
+            const apiKeysTable = document.querySelector('#api-keys-table tbody');
+
+            // Show add key form
+            addKeyBtn.addEventListener('click', () => {
+                addKeyForm.classList.remove('hidden');
+            });
+
+            // Hide add key form
+            cancelAddKeyBtn.addEventListener('click', () => {
+                addKeyForm.classList.add('hidden');
+                apiKeyForm.reset();
+            });
+
+            // Form submission
+            apiKeyForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const provider = document.getElementById('api-provider').value;
+                const key = document.getElementById('api-key-value').value;
+
+                // Add to Firestore
+                db.collection('apiKeys').add({
+                    provider: provider,
+                    key: key,
+                    status: 'active',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: auth.currentUser.uid
+                })
+                .then(() => {
+                    addKeyForm.classList.add('hidden');
+                    apiKeyForm.reset();
+                    loadApiKeys();
+                })
+                .catch(error => {
+                    alert('Error adding API key: ' + error.message);
+                });
+            });
+
+            // Load API keys
+            loadApiKeys();
+
+            function loadApiKeys() {
+                apiKeysTable.innerHTML = '<tr><td colspan="6">Loading API keys...</td></tr>';
+
+                db.collection('apiKeys')
+                    .orderBy('createdAt', 'desc')
+                    .get()
+                    .then(snapshot => {
+                        apiKeysTable.innerHTML = '';
+
+                        if (snapshot.empty) {
+                            apiKeysTable.innerHTML = '<tr><td colspan="6">No API keys found</td></tr>';
+                            return;
+                        }
+
+                        snapshot.forEach(doc => {
+                            const keyData = doc.data();
+                            const statusClass = keyData.status === 'active' ? 'active' : 
+                                             keyData.status === 'limited' ? 'limited' : 'inactive';
+                            
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><span class="api-key-status ${statusClass}"></span> ${keyData.status}</td>
+                                <td>${keyData.provider}</td>
+                                <td>${keyData.key.substring(0, 10)}...</td>
+                                <td>${keyData.usage || '0/1000'}</td>
+                                <td>${keyData.lastUsed ? keyData.lastUsed.toDate().toLocaleString() : 'Never'}</td>
+                                <td>
+                                    <button class="btn" onclick="editApiKey('${doc.id}')" style="padding: 3px 8px; font-size: 12px;">Edit</button>
+                                    <button class="btn btn-danger" onclick="deleteApiKey('${doc.id}')" style="padding: 3px 8px; font-size: 12px;">Delete</button>
+                                </td>
+                            `;
+                            apiKeysTable.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        apiKeysTable.innerHTML = '<tr><td colspan="6">Error loading API keys</td></tr>';
+                        console.error('Error loading API keys:', error);
+                    });
+            }
+        }
+
+        function initAdminsSection() {
+            const addAdminBtn = document.getElementById('add-admin-btn');
+            const cancelAddAdminBtn = document.getElementById('cancel-add-admin');
+            const adminForm = document.getElementById('admin-form');
+            const addAdminForm = document.getElementById('add-admin-form');
+            const adminsTable = document.querySelector('#admins-table tbody');
+
+            // Show add admin form
+            addAdminBtn.addEventListener('click', () => {
+                addAdminForm.classList.remove('hidden');
+            });
+
+            // Hide add admin form
+            cancelAddAdminBtn.addEventListener('click', () => {
+                addAdminForm.classList.add('hidden');
+                adminForm.reset();
+            });
+
+            // Form submission
+            adminForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const email = document.getElementById('admin-email').value;
+                const name = document.getElementById('admin-name').value;
+
+                addAdminUser(email, name);
+            });
+
+            // Load admin users
+            loadAdminUsers();
+
+            function loadAdminUsers() {
+                adminsTable.innerHTML = '<tr><td colspan="5">Loading admin users...</td></tr>';
+
+                db.collection('admins')
+                    .orderBy('createdAt', 'desc')
+                    .get()
+                    .then(snapshot => {
+                        adminsTable.innerHTML = '';
+
+                        if (snapshot.empty) {
+                            adminsTable.innerHTML = '<tr><td colspan="5">No admin users found</td></tr>';
+                            return;
+                        }
+
+                        snapshot.forEach(doc => {
+                            const adminData = doc.data();
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${adminData.email}</td>
+                                <td>${adminData.name || 'N/A'}</td>
+                                <td>${adminData.createdAt?.toDate().toLocaleString() || 'N/A'}</td>
+                                <td>${adminData.lastLogin?.toDate().toLocaleString() || 'Never'}</td>
+                                <td>
+                                    ${doc.id !== auth.currentUser?.uid ? 
+                                        `<button class="btn btn-danger" onclick="deleteAdminUser('${doc.id}')" style="padding: 3px 8px; font-size: 12px;">Remove</button>` : 
+                                        '(Current user)'}
+                                </td>
+                            `;
+                            adminsTable.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        adminsTable.innerHTML = '<tr><td colspan="5">Error loading admin users</td></tr>';
+                        console.error('Error loading admin users:', error);
+                    });
+            }
+        }
+
+        // Global functions for table actions
+        function editApiKey(keyId) {
+            // Implement edit functionality
+            alert('Edit functionality for key: ' + keyId);
+        }
+
+        function deleteApiKey(keyId) {
+            if (confirm('Are you sure you want to delete this API key?')) {
+                db.collection('apiKeys').doc(keyId).delete()
+                    .then(() => {
+                        alert('API key deleted successfully');
+                        loadApiKeys();
+                    })
+                    .catch(error => {
+                        alert('Error deleting API key: ' + error.message);
+                    });
+            }
+        }
+
+        function deleteAdminUser(adminId) {
+            if (confirm('Are you sure you want to remove this admin user?')) {
+                // First remove from admins collection
+                db.collection('admins').doc(adminId).delete()
+                    .then(() => {
+                        // Then delete the user account
+                        return auth.getUser(adminId).then(userRecord => {
+                            return auth.deleteUser(adminId);
+                        });
+                    })
+                    .then(() => {
+                        alert('Admin user removed successfully');
+                        loadAdminUsers();
+                    })
+                    .catch(error => {
+                        alert('Error removing admin user: ' + error.message);
+                    });
+            }
+        }
+
+        function addAdminUser(email, name) {
+            // First check if user already exists
+            auth.getUserByEmail(email)
+                .then(() => {
+                    // User exists, just add to admins collection
+                    return db.collection('admins').doc(email).set({
+                        email: email,
+                        name: name,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert('Admin user added successfully');
+                    document.getElementById('add-admin-form').classList.add('hidden');
+                    document.getElementById('admin-form').reset();
+                    loadAdminUsers();
+                })
+                .catch(error => {
+                    if (error.code === 'auth/user-not-found') {
+                        // User doesn't exist, create new account
+                        const password = generateRandomPassword();
+                        
+                        return auth.createUserWithEmailAndPassword(email, password)
+                            .then((userCredential) => {
+                                // Add to admins collection
+                                return db.collection('admins').doc(userCredential.user.uid).set({
+                                    email: email,
+                                    name: name,
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                            })
+                            .then(() => {
+                                // Send password reset email
+                                return auth.sendPasswordResetEmail(email);
+                            })
+                            .then(() => {
+                                alert('Admin user created successfully. Password reset email sent.');
+                                document.getElementById('add-admin-form').classList.add('hidden');
+                                document.getElementById('admin-form').reset();
+                                loadAdminUsers();
+                            });
+                    } else {
+                        throw error;
+                    }
+                })
+                .catch(error => {
+                    alert('Error adding admin user: ' + error.message);
+                });
+        }
+
+        function generateRandomPassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+            let password = '';
+            for (let i = 0; i < 16; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+    </script>
+</body>
+</html>
